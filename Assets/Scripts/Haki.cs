@@ -25,9 +25,13 @@ public class Haki : MonoBehaviour
 
     [SerializeField] private float _skillFinishTime; //7�ʷ� �� ����
 
-    [SerializeField] private float _spritEffectEuler; //
+    [SerializeField] private float _spritEffectEuler; 
 
     [SerializeField] private float _lightIntensity; //빛세기
+
+    [SerializeField] private float _MaxlightIntensity; //빛세기
+
+    [SerializeField] private int _boltEffectNum; // 1�� �� ����
 
     [SerializeField] private float _vibration; // ��������
 
@@ -73,7 +77,6 @@ public class Haki : MonoBehaviour
 
         if (other.gameObject.tag == "RightHand")
         {
-            Debug.Log("hi");
             _controller = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         }
     }
@@ -144,22 +147,30 @@ public class Haki : MonoBehaviour
             Light light = _lightEffect.GetComponentInChildren<Light>();
 
             float vibration = 0;
-            while (_gage < _canUseSkillGage)
+            while (true)
             {
                 vibration += _vibration;
                 vibration = Mathf.Clamp(vibration, 0f, _maxVibration);
                 _controller.SendHapticImpulse(0, vibration, _vibrateDurateTime);
 
+                Debug.Log(vibration);
+
                 light.intensity += _lightIntensity;
-                _spritEffectdir = Vector3.zero;
+                light.intensity = Mathf.Clamp(light.intensity, 0f, _MaxlightIntensity);
+
 
                 _gage += _gatherGageAmount;
-                GameObject boltEffect = Instantiate(_HakiEffect[(int)EHakiEffect.Bolt], transform);
-                _boltEffects.Add(boltEffect);
+                _gage = Mathf.Clamp(_gage, 0f, _canUseSkillGage);
 
-                boltEffect.transform.localPosition = Vector3.zero;
-                _spritEffectdir.y = _spritEffectEuler * (_boltEffects.Count - 1);
-                boltEffect.transform.localRotation = Quaternion.Euler(_spritEffectdir);
+                if (_boltEffects.Count < _boltEffectNum)
+                {
+                    GameObject boltEffect = Instantiate(_HakiEffect[(int)EHakiEffect.Bolt], transform);
+                    _boltEffects.Add(boltEffect);
+                    boltEffect.transform.localPosition = Vector3.zero;
+                    _spritEffectdir = Vector3.zero;
+                    _spritEffectdir.y = _spritEffectEuler * (_boltEffects.Count - 1);
+                    boltEffect.transform.localRotation = Quaternion.Euler(_spritEffectdir);
+                }
 
                 yield return _gatherSeconds;
             }
@@ -183,18 +194,14 @@ public class Haki : MonoBehaviour
         _isUseSkill = true;
 
         _audio.clip = _audioClips[(int)EHakiSound.ReleaseEnergy];
-        _audio.loop = true;
+        _audio.loop = false;
         _audio.Play();
 
-        if (_gage >= _canUseSkillGage)
-        {
-            _galaxyDevide = Instantiate(_skillEffect, transform);
-            _galaxyDevide.transform.localPosition = Vector3.zero;
-        }
+        _galaxyDevide = Instantiate(_skillEffect, transform);
+        _galaxyDevide.transform.localPosition = Vector3.zero;
 
         yield return _releaseSeconds;
 
-        Destroy(_galaxyDevide);
         Reset();
     }
 
