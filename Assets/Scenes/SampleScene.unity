@@ -475,7 +475,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
@@ -642,6 +642,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1268410845464619220, guid: f17e81f9ca2214d46b858099f5352cc7, type: 3}
+      propertyPath: _boltNum
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268410845464619220, guid: f17e81f9ca2214d46b858099f5352cc7, type: 3}
       propertyPath: _vibration
       value: 0.2
       objectReference: {fileID: 0}
@@ -650,12 +654,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1268410845464619220, guid: f17e81f9ca2214d46b858099f5352cc7, type: 3}
+      propertyPath: _boltEffectNum
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268410845464619220, guid: f17e81f9ca2214d46b858099f5352cc7, type: 3}
       propertyPath: _skillFinishTime
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1268410845464619220, guid: f17e81f9ca2214d46b858099f5352cc7, type: 3}
+      propertyPath: _MaxlightIntensity
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268410845464619220, guid: f17e81f9ca2214d46b858099f5352cc7, type: 3}
       propertyPath: _vibrateDurateTime
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1268410845464619223, guid: f17e81f9ca2214d46b858099f5352cc7, type: 3}
       propertyPath: m_RootOrder
