@@ -1,14 +1,15 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public enum EHakiSound {Select, ChargingEnergy, ReleaseEnergy }
+public enum EHakiSound { Select, ChargingEnergy, ReleaseEnergy }
 
-public enum EHakiEffect {Light, Bolt}
+public enum EHakiEffect { Light, Bolt }
 
 public class Haki : MonoBehaviour
 {
@@ -16,23 +17,23 @@ public class Haki : MonoBehaviour
 
     [SerializeField] private GameObject _skillEffect;
 
-    [SerializeField] private int _canUseSkillGage; // 3À¸·Î µÑ ¿¹Á¤
+    [SerializeField] private int _canUseSkillGage; // 3ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    [SerializeField] private int _gatherGageAmount; // 1·Î µÑ ¿¹Á¤
+    [SerializeField] private int _gatherGageAmount; // 1ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    [SerializeField] private float _gatherDurateTime; //1ÃÊ·Î µÑ ¿¹Á¤
+    [SerializeField] private float _gatherDurateTime; //1ï¿½Ê·ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    [SerializeField] private float _skillFinishTime; //7ÃÊ·Î µÑ ¿¹Á¤
+    [SerializeField] private float _skillFinishTime; //7ï¿½Ê·ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    [SerializeField] private float _spritEffectEuler; //45µµ¾¿ µ¹·Á¼­ »ý¼º
+    [SerializeField] private float _spritEffectEuler; //
 
-    [SerializeField] private float _lightIntensity; //lightÀÌÆåÆ® ¼¼±â
+    [SerializeField] private float _lightIntensity; //ë¹›ì„¸ê¸°
 
-    [SerializeField] private float _vibration; // Áøµ¿¼¼±â
+    [SerializeField] private float _vibration; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    [SerializeField] private float _maxVibration; // Áøµ¿¼¼±â
+    [SerializeField] private float _maxVibration; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    [SerializeField] private float _vibrateDurateTime; //Áøµ¿½Ã°£
+    [SerializeField] private float _vibrateDurateTime; //ï¿½ï¿½ï¿½ï¿½ï¿½Ã°ï¿½
 
     [SerializeField] private AudioSource _audio;
 
@@ -69,14 +70,13 @@ public class Haki : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        
-        if(other.gameObject.tag == "RightHand")
+
+        if (other.gameObject.tag == "RightHand")
         {
             Debug.Log("hi");
             _controller = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         }
     }
-
     public void SelectHaki()
     {
         _audio.PlayOneShot(_audioClips[(int)EHakiSound.Select]);
@@ -88,8 +88,8 @@ public class Haki : MonoBehaviour
 
     public void ReleaseEnergy()
     {
-        if(_gatherEnergyRoutine != null)
-        {     
+        if (_gatherEnergyRoutine != null)
+        {
             StopCoroutine(_gatherEnergyRoutine);
         }
         _gatherEnergyRoutine = null;
@@ -102,7 +102,8 @@ public class Haki : MonoBehaviour
         {
             for (int i = 0; i < _boltEffects.Count; i++)
             {
-                if((_boltEffects[i].activeSelf == true)){
+                if ((_boltEffects[i].activeSelf == true))
+                {
                     Destroy(_boltEffects[i]);
                 }
             }
@@ -114,7 +115,7 @@ public class Haki : MonoBehaviour
             StopCoroutine(_gatherEnergyRoutine);
             _gatherEnergyRoutine = null;
         }
-        if(_releaseEnergyRoutine != null)
+        if (_releaseEnergyRoutine != null)
         {
             if (_galaxyDevide.activeSelf == true)
             {
@@ -143,19 +144,14 @@ public class Haki : MonoBehaviour
             Light light = _lightEffect.GetComponentInChildren<Light>();
 
             float vibration = 0;
-            while (true)
+            while (_gage < _canUseSkillGage)
             {
-               
                 vibration += _vibration;
                 vibration = Mathf.Clamp(vibration, 0f, _maxVibration);
                 _controller.SendHapticImpulse(0, vibration, _vibrateDurateTime);
+
                 light.intensity += _lightIntensity;
                 _spritEffectdir = Vector3.zero;
-
-                if(_gage < _canUseSkillGage)
-                {
-                    continue;
-                }
 
                 _gage += _gatherGageAmount;
                 GameObject boltEffect = Instantiate(_HakiEffect[(int)EHakiEffect.Bolt], transform);
