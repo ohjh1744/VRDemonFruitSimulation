@@ -1,21 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 
 public enum EHakiSound { Select, ChargingEnergy, ReleaseEnergy }
-
-public enum EHakiEffect { Light, Bolt }
+public enum EHakiEffect { Light, Bolt, Energy }
 
 public class Haki : MonoBehaviour
 {
-    [SerializeField] private GameObject[] _HakiEffect;
-
-    [SerializeField] private GameObject _skillEffect;
+    [SerializeField] private GameObject[] _hakiEffect;
 
     [SerializeField] private int _canUseSkillGage; // 3���� �� ����
 
@@ -63,7 +56,7 @@ public class Haki : MonoBehaviour
 
     private GameObject _lightEffect;
 
-    private Vector3 _spritEffectdir;
+    private Vector3 _boltEffectdir;
 
     private List<GameObject> _boltEffects;
 
@@ -91,48 +84,54 @@ public class Haki : MonoBehaviour
 
     public void ReleaseEnergy()
     {
-        if (_gatherEnergyRoutine != null)
-        {
-            StopCoroutine(_gatherEnergyRoutine);
-        }
-        _gatherEnergyRoutine = null;
         _releaseEnergyRoutine = StartCoroutine(UseGalaxyDevide());
     }
 
     public void Reset()
     {
+        ResetGatherEnergy();
+        ResetReleaseEnergy();
+        _isUseSkill = false;
+        _audio.loop = false;
+        _audio.Stop();
+    }
+
+    private void ResetGatherEnergy()
+    {
         if (_gatherEnergyRoutine != null)
         {
-            for (int i = 0; i < _boltEffects.Count; i++)
+            foreach (GameObject bolt in _boltEffects)
             {
-                if ((_boltEffects[i].activeSelf == true))
+                if (bolt.activeSelf == true)
                 {
-                    Destroy(_boltEffects[i]);
+                    Destroy(bolt);
                 }
             }
+            _boltEffects.Clear();
+
             if (_lightEffect.activeSelf == true)
             {
                 Destroy(_lightEffect);
             }
-            _boltEffects.Clear();
+
             StopCoroutine(_gatherEnergyRoutine);
             _gatherEnergyRoutine = null;
         }
+    }
+
+    private void ResetReleaseEnergy()
+    {
         if (_releaseEnergyRoutine != null)
         {
             if (_galaxyDevide.activeSelf == true)
             {
                 Destroy(_galaxyDevide);
             }
+
             StopCoroutine(_releaseEnergyRoutine);
             _releaseEnergyRoutine = null;
         }
-
-        _isUseSkill = false;
-        _audio.loop = false;
-        _audio.Stop();
     }
-
     private IEnumerator UpEnergy()
     {
         _gage = 0;
@@ -142,34 +141,31 @@ public class Haki : MonoBehaviour
             _audio.loop = true;
             _audio.Play();
 
-            _lightEffect = Instantiate(_HakiEffect[(int)EHakiEffect.Light], transform);
+            _lightEffect = Instantiate(_hakiEffect[(int)EHakiEffect.Light], transform);
             _lightEffect.transform.localPosition = Vector3.zero;
             Light light = _lightEffect.GetComponentInChildren<Light>();
 
             float vibration = 0;
             while (true)
             {
-                vibration += _vibration;
-                vibration = Mathf.Clamp(vibration, 0f, _maxVibration);
-                _interactor.SendHapticImpulse(vibration, _vibrateDurateTime);
-
-                Debug.Log(vibration);
-
                 light.intensity += _lightIntensity;
                 light.intensity = Mathf.Clamp(light.intensity, 0f, _MaxlightIntensity);
 
+                vibration += _vibration;
+                vibration = Mathf.Clamp(vibration, 0f, _maxVibration);
+                _interactor.SendHapticImpulse(vibration, _vibrateDurateTime);
 
                 _gage += _gatherGageAmount;
                 _gage = Mathf.Clamp(_gage, 0f, _canUseSkillGage);
 
                 if (_boltEffects.Count < _boltEffectNum)
                 {
-                    GameObject boltEffect = Instantiate(_HakiEffect[(int)EHakiEffect.Bolt], transform);
+                    GameObject boltEffect = Instantiate(_hakiEffect[(int)EHakiEffect.Bolt], transform);
                     _boltEffects.Add(boltEffect);
                     boltEffect.transform.localPosition = Vector3.zero;
-                    _spritEffectdir = Vector3.zero;
-                    _spritEffectdir.y = _spritEffectEuler * (_boltEffects.Count - 1);
-                    boltEffect.transform.localRotation = Quaternion.Euler(_spritEffectdir);
+                    _boltEffectdir = Vector3.zero;
+                    _boltEffectdir.y = _spritEffectEuler * (_boltEffects.Count - 1);
+                    boltEffect.transform.localRotation = Quaternion.Euler(_boltEffectdir);
                 }
 
                 yield return _gatherSeconds;
@@ -179,12 +175,7 @@ public class Haki : MonoBehaviour
 
     private IEnumerator UseGalaxyDevide()
     {
-        for (int i = 0; i < _boltEffects.Count; i++)
-        {
-            Destroy(_boltEffects[i]);
-        }
-        _boltEffects.Clear();
-        Destroy(_lightEffect);
+        ResetGatherEnergy();
 
         if (_gage < _canUseSkillGage)
         {
@@ -197,7 +188,7 @@ public class Haki : MonoBehaviour
         _audio.loop = false;
         _audio.Play();
 
-        _galaxyDevide = Instantiate(_skillEffect, transform);
+        _galaxyDevide = Instantiate(_hakiEffect[(int)EHakiEffect.Energy], transform);
         _galaxyDevide.transform.localPosition = Vector3.zero;
 
         yield return _releaseSeconds;
