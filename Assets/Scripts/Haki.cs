@@ -43,6 +43,10 @@ public class Haki : MonoBehaviour
 
     [SerializeField] private AudioClip[] _audioClips;
 
+    [SerializeField] private XRGrabInteractable _interactable;
+
+    private XRDirectInteractor _interactor;
+
     private Coroutine _gatherEnergyRoutine;
 
     private Coroutine _releaseEnergyRoutine;
@@ -63,7 +67,6 @@ public class Haki : MonoBehaviour
 
     private List<GameObject> _boltEffects;
 
-    private InputDevice _controller;
 
     private void Start()
     {
@@ -72,13 +75,10 @@ public class Haki : MonoBehaviour
         _releaseSeconds = new WaitForSeconds(_skillFinishTime);
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void GetController(SelectEnterEventArgs args)
     {
-
-        if (other.gameObject.tag == "RightHand")
-        {
-            _controller = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-        }
+        _interactor = args.interactor as XRDirectInteractor;
+        Debug.Log(_interactor.gameObject.name);
     }
     public void SelectHaki()
     {
@@ -151,7 +151,7 @@ public class Haki : MonoBehaviour
             {
                 vibration += _vibration;
                 vibration = Mathf.Clamp(vibration, 0f, _maxVibration);
-                _controller.SendHapticImpulse(0, vibration, _vibrateDurateTime);
+                _interactor.SendHapticImpulse(vibration, _vibrateDurateTime);
 
                 Debug.Log(vibration);
 
