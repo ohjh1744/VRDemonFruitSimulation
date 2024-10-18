@@ -1,17 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public enum EIceEffect {HandIceEffect, IceEffect }
+
 public class IceFruit : MonoBehaviour
 {
     [SerializeField] private GameObject[] _skillEffects;
 
-    [SerializeField] private float _iceAgeWideTime;
+    [SerializeField] private float _iceAgeMakeDurateTime;
 
-    [SerializeField] private float _iceAgeWideRange;
+    [SerializeField] private float _fruitScale;
 
-    [SerializeField] private float _iceAgeDestroyTime;
+    [SerializeField] private int _devilFruitLayer;
+
+    [SerializeField] private AudioSource _audio;
+
+    [SerializeField] private AudioClip _audioClip;
 
     private GameObject _handEffect;
 
@@ -23,85 +30,93 @@ public class IceFruit : MonoBehaviour
 
     private WaitForSeconds _makeRoutineSeconds;
 
-    private Vector3 _iceAgeRange;
-
-    private Coroutine _destroyRoutine;
-
-    private WaitForSeconds _destroyRoutineSeconds;
+    private XRDirectInteractor _interactor;
 
     private void Start()
     {
-        _makeRoutineSeconds = new WaitForSeconds(_iceAgeWideTime);
-        _iceAgeRange = Vector3.zero;
-        _destroyRoutineSeconds = new WaitForSeconds(_iceAgeDestroyTime);
+        _makeRoutineSeconds = new WaitForSeconds(_iceAgeMakeDurateTime);
     }
 
-    private void ResetSkill()
+    private void Update()
     {
-        if(_handEffect.activeSelf == true)
+        // 스킬 사용하고 있을때에만 체크
+        if (_isUseSkill == true)
         {
-            Destroy(_handEffect);
+            CheckContact();
         }
-        _isUseSkill = false;
+    }
+
+    private void CheckContact()
+    {
+
+        Collider[] contacts = Physics.OverlapSphere(transform.position, _fruitScale);
+        // 닿은 오브젝트가 없다면  아이스에이지 생성 멈춤.
+        if(contacts.Length == 0)
+        {
+            if (_makeRoutine != null)
+            {
+                StopCoroutine(_makeRoutine);
+                _makeRoutine = null;
+                _isUseSkill = false;
+            }
+        }
+        else
+        {
+            // 닿은 오브젝트가 있다면 아이스에이지생성
+            foreach (Collider contact in contacts)
+            {
+                if (contact.gameObject.layer != _devilFruitLayer && _makeRoutine == null)
+                {
+                    _makeRoutine = StartCoroutine(MakeWideIceAge(contacts[0].transform.position));
+                    break;
+                }
+            }
+        }
     }
 
     public void ComeOutHandIceEffect()
     {
+        _audio.loop = true;
+        _audio.clip = _audioClip;
+        _audio.Play();
         _handEffect = Instantiate(_skillEffects[(int)EIceEffect.HandIceEffect], transform);
-        _handEffect.transform.position = Vector3.zero;
+        _handEffect.transform.localPosition = Vector3.zero;
         _isUseSkill = true;
     }
 
     public void ComeInHandIceEffect()
     {
-        ResetSkill();
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if(collision.gameObject != null && _isUseSkill)
+        _audio.loop = false;
+        _audio.Stop();
+        if (_handEffect != null)
         {
-            _iceAge = Instantiate(_skillEffects[(int)EIceEffect.IceEffect]);
-            _iceAge.transform.position = collision.contacts[0].point;
+            Destroy(_handEffect);
+        }
+        if(_makeRoutine != null)
+        {
+            StopCoroutine(_makeRoutine);
+            _makeRoutine = null;
+            _isUseSkill = false;
         }
     }
 
-    private void OnCollisionStay(Collision collision)
-    {
-        _makeRoutine = StartCoroutine(MakeWideIceAge());
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        StopCoroutine(_makeRoutine);
-        _destroyRoutine = StartCoroutine(DestroyIceAge());
-
-    }
-
-    private IEnumerator MakeWideIceAge()
+    private IEnumerator MakeWideIceAge(Vector3 iceAgePos)
     {
         while (true)
         {
-            _iceAgeRange.x += _iceAgeWideRange;
-            _iceAgeRange.z += _iceAgeWideRange;
-            _iceAge.transform.localScale = _iceAgeRange;
+            _iceAge = Instantiate(_skillEffects[(int)EIceEffect.IceEffect]);
+            _iceAge.transform.position = iceAgePos;
+
             yield return _makeRoutineSeconds;
+
+            _audio.Stop();
         }
     }
 
-    private IEnumerator DestroyIceAge()
+    private void OnDrawGizmos()
     {
-        ParticleSystem[] particles = _iceAge.GetComponentsInChildren<ParticleSystem>();
-        foreach(ParticleSystem particle in particles)
-        {
-            particle.loop = false;
-        }
-
-        yield return _destroyRoutineSeconds;
-
-        Destroy(_iceAge);
-        _destroyRoutine = null;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(transform.position, _fruitScale);
     }
-
 
 }
