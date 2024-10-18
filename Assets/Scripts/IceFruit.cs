@@ -50,14 +50,15 @@ public class IceFruit : MonoBehaviour
     {
 
         Collider[] contacts = Physics.OverlapSphere(transform.position, _fruitScale);
-        // 닿은 오브젝트가 없다면  아이스에이지 생성 멈춤.
-        if(contacts.Length == 0)
+        Debug.Log(contacts.Length);
+        // 닿은 오브젝트가 없다면  아이스에이지 생성 멈춤. 1은 손 하나
+        if (contacts.Length == 1)
         {
             if (_makeRoutine != null)
             {
+                Debug.Log("hhh");
                 StopCoroutine(_makeRoutine);
                 _makeRoutine = null;
-                _isUseSkill = false;
             }
         }
         else
@@ -67,7 +68,7 @@ public class IceFruit : MonoBehaviour
             {
                 if (contact.gameObject.layer != _devilFruitLayer && _makeRoutine == null)
                 {
-                    _makeRoutine = StartCoroutine(MakeWideIceAge(contacts[0].transform.position));
+                    _makeRoutine = StartCoroutine(MakeWideIceAge(contact.ClosestPoint(transform.position)));
                     break;
                 }
             }
@@ -96,8 +97,8 @@ public class IceFruit : MonoBehaviour
         {
             StopCoroutine(_makeRoutine);
             _makeRoutine = null;
-            _isUseSkill = false;
         }
+        _isUseSkill = false;
     }
 
     private IEnumerator MakeWideIceAge(Vector3 iceAgePos)
