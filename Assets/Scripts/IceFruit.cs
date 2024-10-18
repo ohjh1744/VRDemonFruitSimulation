@@ -51,7 +51,7 @@ public class IceFruit : MonoBehaviour
 
         Collider[] contacts = Physics.OverlapSphere(transform.position, _fruitScale);
         Debug.Log(contacts.Length);
-        // 닿은 오브젝트가 없다면  아이스에이지 생성 멈춤. 1은 손 하나
+        // 닿은 오브젝트가 없다면  아이스에이지 생성 멈춤. 1은 손 하나로 닿은 오브젝트가 없음.
         if (contacts.Length == 1)
         {
             if (_makeRoutine != null)
