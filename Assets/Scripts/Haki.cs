@@ -36,8 +36,6 @@ public class Haki : MonoBehaviour
 
     [SerializeField] private AudioClip[] _audioClips;
 
-    [SerializeField] private XRGrabInteractable _interactable;
-
     private XRDirectInteractor _interactor;
 
     private Coroutine _gatherEnergyRoutine;
@@ -70,7 +68,7 @@ public class Haki : MonoBehaviour
 
     public void GetController(SelectEnterEventArgs args)
     {
-        _interactor = args.interactor as XRDirectInteractor;
+        _interactor = args.interactorObject as XRDirectInteractor;
         Debug.Log(_interactor.gameObject.name);
     }
     public void SelectHaki()
