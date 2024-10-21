@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7696045565573544957}
   - component: {fileID: 2973220526585246225}
+  - component: {fileID: -1330605410531265205}
   m_Layer: 0
   m_Name: FirePist
   m_TagString: Untagged
@@ -48,3 +49,16 @@ MonoBehaviour:
   - {fileID: 1504370297079926, guid: c0e9b376e9e1d99499ebcdac2c89fb1e, type: 3}
   m_movePos: {fileID: 0}
   m_randomRotationValue: {x: 0, y: 0, z: 0}
+--- !u!114 &-1330605410531265205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5656246445167552521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a06d88f5dd0d434a9348e12773879da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _time: 2

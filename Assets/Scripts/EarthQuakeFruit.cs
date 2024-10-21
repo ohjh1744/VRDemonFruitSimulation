@@ -71,7 +71,10 @@ public class EarthQuakeFruit : MonoBehaviour
             _earthQuakeEffect.transform.rotation = Quaternion.LookRotation(effectDir);
 
         }
+ 
     }
+
+   
 
 
 }
