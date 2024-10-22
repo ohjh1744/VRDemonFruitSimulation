@@ -50,9 +50,10 @@ public class IceFruit : MonoBehaviour
     {
 
         Collider[] contacts = Physics.OverlapSphere(transform.position, _fruitScale);
-        // 닿은 오브젝트가 없다면  아이스에이지 생성 멈춤. 1은 손 하나로 닿은 오브젝트가 없음.
+        // 닿은 오브젝트가 없다면  아이스에이지 생성 멈춤. IceFruit 본인은 항상 닿아있으므로 1, 본인제외한 length 0.
         if (contacts.Length == 1)
         {
+            Debug.Log($"{contacts[0].gameObject.name} 닿은 오브젝트 없으");
             if (_makeRoutine != null)
             {
                 StopCoroutine(_makeRoutine);
@@ -66,6 +67,7 @@ public class IceFruit : MonoBehaviour
             {
                 if (contact.gameObject.layer != _devilFruitLayer && _makeRoutine == null)
                 {
+                    Debug.Log(contact.gameObject.name);
                     _makeRoutine = StartCoroutine(MakeWideIceAge(contact.ClosestPoint(transform.position)));
                     break;
                 }
